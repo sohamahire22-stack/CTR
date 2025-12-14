@@ -133,9 +133,7 @@ async function generateThumbnail() {
 
     try { // ... (start of async fetch)
 
-    // --- MAIN LOGIC WRAPPED IN TRY/CATCH TO PREVENT 500 CRASH ---
-    try {
-        // --- CRITICAL DEBUG CHECK ---
+  
         let requestBody;
         try {
             requestBody = await request.json();
