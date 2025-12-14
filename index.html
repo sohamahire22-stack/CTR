@@ -157,34 +157,25 @@
 </div>
 
 <script>
-function generate() {
- fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev/", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    topic: document.getElementById("topic").value,
-    audience: document.getElementById("audience").value,
-    language: document.getElementById("language").value
-  })
-})
-.then(res => res.json())
-.then(data => {
+async function generateThumbnail() {
+  const topic = document.getElementById("topic").value;
+  const audience = document.getElementById("audience").value;
+  const language = document.getElementById("language").value;
+
+  document.getElementById("output").innerText = "Thinking...";
+
+  const res = await fetch("https://ctr-thumbnail-brain.YOURNAME.workers.dev", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic, audience, language })
+  });
+
+  const data = await res.json();
   document.getElementById("output").innerText =
     data.response || JSON.stringify(data, null, 2);
-})
-.catch(err => {
-  document.getElementById("output").innerText = "Error connecting AI";
-});
-
-  document.getElementById("intent").innerText = "STRATEGY";
-  document.getElementById("faceUsage").innerText = "Yes · Confident · Right side (35%)";
-  document.getElementById("thumbText").innerText = "90+ MARKS";
-  document.getElementById("colors").innerText = "Yellow + Dark Blue";
-  document.getElementById("layout").innerText = "Face on right edge, text on left, object blurred in center";
-
-  document.getElementById("output").style.display = "block";
 }
 </script>
+
 
 </body>
 </html>
