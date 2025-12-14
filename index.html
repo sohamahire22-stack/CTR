@@ -197,8 +197,19 @@ async function generateThumbnail() {
   document.getElementById("intent").innerText =
     data.intent || "Educational CTR optimization";
 
-  document.getElementById("faceUsage").innerText =
-    data.face || "Use expressiv
+ document.getElementById("faceUsage").innerText =
+    data.face || "Use expressive face on 1/3rd side";
+
+  document.getElementById("thumbText").innerText =
+    data.thumbnail_text || "Crack This Fast";
+
+  document.getElementById("colors").innerText =
+    data.colors || "Yellow + Black (High contrast)";
+
+  document.getElementById("layout").innerText =
+    data.layout || "Face left, text right, topic visual centered";
+}
+</script>
 
 
 
