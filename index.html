@@ -1,217 +1,223 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>CTR Thumbnail Engine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <title>CTR Thumbnail Engine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      margin: 0;
-      padding: 0;
-    }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+    }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 40px 20px;
-    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 40px 20px;
+    }
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
 
-    p {
-      color: #cbd5f5;
-      margin-bottom: 30px;
-    }
+    p {
+      color: #cbd5f5;
+      margin-bottom: 30px;
+    }
 
-    .card {
-      background: #020617;
-      border-radius: 12px;
-      padding: 25px;
-      margin-bottom: 30px;
-    }
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 30px;
+    }
 
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
 
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #020617;
-      color: white;
-      border: 1px solid #334155;
-    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      background: #020617;
+      color: white;
+      border: 1px solid #334155;
+    }
 
-    button {
-      margin-top: 25px;
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      background: #6366f1;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+    button {
+      margin-top: 25px;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
 
-    button:hover {
-      background: #4f46e5;
-    }
+    button:hover {
+      background: #4f46e5;
+    }
 
-    .output {
-      display: none;
-    }
+    .output {
+      display: none;
+    }
 
-    .output-box {
-      background: #020617;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 15px;
-      border: 1px solid #334155;
-    }
+    .output-box {
+      background: #020617;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 15px;
+      border: 1px solid #334155;
+    }
 
-    .output-box strong {
-      color: #a5b4fc;
-    }
+    .output-box strong {
+      color: #a5b4fc;
+    }
 
-    footer {
-      text-align: center;
-      font-size: 14px;
-      color: #64748b;
-      margin-top: 50px;
-    }
-  </style>
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 50px;
+    }
+  </style>
 </head>
 
 <body>
 
 <div class="container">
-  <h1>CTR Thumbnail Engine</h1>
-  <p>Generate high-click thumbnail plans for Indian education creators using proven CTR logic.</p>
+  <h1>CTR Thumbnail Engine</h1>
+  <p>Generate high-click thumbnail plans for Indian education creators using proven CTR logic.</p>
 
-  <div class="card">
-    <label>Video Title</label>
-    <input id="title" placeholder="Enter your YouTube video title"/>
+  <div class="card">
+    <label>Video Title</label>
+    <input id="title" placeholder="Enter your YouTube video title"/>
 
-    <label>Video Topic / Syllabus</label>
-    <input id="topic" placeholder="Ex: Trigonometry Board Exam"/>
+    <label>Video Topic / Syllabus</label>
+    <input id="topic" placeholder="Ex: Trigonometry Board Exam"/>
 
-    <label>Exam Type</label>
-    <select id="exam">
-      <option>Board</option>
-      <option>JEE</option>
-      <option>NEET</option>
-      <option>Skill</option>
-      <option>General Education</option>
-    </select>
+    <label>Exam Type</label>
+    <select id="exam">
+      <option>Board</option>
+      <option>JEE</option>
+      <option>NEET</option>
+      <option>Skill</option>
+      <option>General Education</option>
+    </select>
 
-    <label>Audience Level</label>
-    <select id="audience">
-      <option>Beginner</option>
-      <option>Intermediate</option>
-      <option>Advanced</option>
-    </select>
+    <label>Audience Level</label>
+    <select id="audience">
+      <option>Beginner</option>
+      <option>Intermediate</option>
+      <option>Advanced</option>
+    </select>
 
-    <label>Face Available?</label>
-    <select id="face">
-      <option>Yes</option>
-      <option>No</option>
-    </select>
+    <label>Face Available?</label>
+    <select id="face">
+      <option>Yes</option>
+      <option>No</option>
+    </select>
 
-    <label>Urgency Level</label>
-    <select id="urgency">
-      <option>Normal</option>
-      <option>Exam Soon</option>
-      <option>Result Phase</option>
-    </select>
+    <label>Urgency Level</label>
+    <select id="urgency">
+      <option>Normal</option>
+      <option>Exam Soon</option>
+      <option>Result Phase</option>
+    </select>
 
-   <button onclick="generateThumbnail()">Generate</button>
+    <label>Creator Personality</label>
+    <select id="personality">
+      <option>Calm</option>
+      <option>Energetic</option>
+      <option>Authority</option>
+    </select>
 
-  </div>
+   <button onclick="generateThumbnail()">Generate</button>
 
-  <div class="card output" id="output">
-    <h2>CTR Thumbnail Plan</h2>
+  </div>
 
-    <div class="output-box"><strong>Video Intent:</strong> <span id="intent"></span></div>
-    <div class="output-box"><strong>Face Usage:</strong> <span id="faceUsage"></span></div>
-    <div class="output-box"><strong>Thumbnail Text:</strong> <span id="thumbText"></span></div>
-    <div class="output-box"><strong>Color Palette:</strong> <span id="colors"></span></div>
-    <div class="output-box"><strong>Layout Instructions:</strong> <span id="layout"></span></div>
-  </div>
+  <div class="card output" id="output">
+    <h2>CTR Thumbnail Plan</h2>
 
-  <footer>
-    Built for Indian education creators · CTR-first system
-  </footer>
+    <div class="output-box"><strong>Video Intent:</strong> <span id="intent"></span></div>
+    <div class="output-box"><strong>Face Usage:</strong> <span id="faceUsage"></span></div>
+    <div class="output-box"><strong>Thumbnail Text:</strong> <span id="thumbText"></span></div>
+    <div class="output-box"><strong>Color Palette:</strong> <span id="colors"></span></div>
+    <div class="output-box"><strong>Layout Instructions:</strong> <span id="layout"></span></div>
+  </div>
+
+  <footer>
+    Built for Indian education creators · CTR-first system
+  </footer>
 </div>
 
 <script>
 async function generateThumbnail() {
-  // Read inputs
-  const title = document.getElementById("title").value;
-  const topic = document.getElementById("topic").value;
-  const exam = document.getElementById("exam").value;
-  const audience = document.getElementById("audience").value;
-  const face = document.getElementById("face").value;
-  const urgency = document.getElementById("urgency").value;
+  // Read inputs
+  const title = document.getElementById("title").value;
+  const topic = document.getElementById("topic").value;
+  const exam = document.getElementById("exam").value;
+  const audience = document.getElementById("audience").value;
+  const face = document.getElementById("face").value;
+  const urgency = document.getElementById("urgency").value;
+  const personality = document.getElementById("personality").value; // Added
 
-  // Show output card
-  document.getElementById("output").style.display = "block";
+  // Show output card
+  document.getElementById("output").style.display = "block";
 
-  // Temporary loading state
-  document.getElementById("intent").innerText = "Analyzing video intent...";
-  document.getElementById("faceUsage").innerText = "Processing...";
-  document.getElementById("thumbText").innerText = "Generating...";
-  document.getElementById("colors").innerText = "Choosing...";
-  document.getElementById("layout").innerText = "Designing...";
+  // Temporary loading state
+  document.getElementById("intent").innerText = "Analyzing video intent...";
+  document.getElementById("faceUsage").innerText = "Processing...";
+  document.getElementById("thumbText").innerText = "Generating...";
+  document.getElementById("colors").innerText = "Choosing...";
+  document.getElementById("layout").innerText = "Designing...";
 
-  // Call backend AI
-  const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      title,
-      topic,
-      exam,
-      audience,
-      face,
-      urgency
-    })
-  });
+  // Call backend AI
+  const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title,
+      topic,
+      exam,
+      audience,
+      face,
+      urgency,
+      personality // Added
+    })
+  });
 
-  const data = await res.json();
+  const data = await res.json();
 
-  // Fill outputs
-  document.getElementById("intent").innerText =
-    data.intent || "Educational CTR optimization";
+  // Fill outputs
+  document.getElementById("intent").innerText =
+    data.intent || "Educational CTR optimization";
 
- document.getElementById("faceUsage").innerText =
-    data.face || "Use expressive face on 1/3rd side";
+ document.getElementById("faceUsage").innerText =
+    data.face || "Use expressive face on 1/3rd side";
 
-  document.getElementById("thumbText").innerText =
-    data.thumbnail_text || "Crack This Fast";
+  document.getElementById("thumbText").innerText =
+    data.thumbnail_text || "Crack This Fast";
 
-  document.getElementById("colors").innerText =
-    data.colors || "Yellow + Black (High contrast)";
+  document.getElementById("colors").innerText =
+    data.colors || "Yellow + Black (High contrast)";
 
-  document.getElementById("layout").innerText =
-    data.layout || "Face left, text right, topic visual centered";
+  document.getElementById("layout").innerText =
+    data.layout || "Face left, text right, topic visual centered";
 }
 </script>
-
-
 
 </body>
 </html>
