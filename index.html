@@ -131,7 +131,26 @@ async function generateThumbnail() {
     
     const hasFace = document.getElementById("userFace").files.length > 0 ? "Yes" : "No";
 
+    try { // ... (start of async fetch)
+
+    // --- MAIN LOGIC WRAPPED IN TRY/CATCH TO PREVENT 500 CRASH ---
     try {
+        // --- CRITICAL DEBUG CHECK ---
+        let requestBody;
+        try {
+            requestBody = await request.json();
+        } catch (e) {
+            // This catches a scenario where the browser sends a bad JSON payload
+            throw new Error("Failed to parse request body as JSON. Check your fetch headers.");
+        }
+        // Destructure from the successfully parsed body
+        const { title, topic, urgency, personality, face } = requestBody;
+        // --- END CRITICAL DEBUG CHECK ---
+        
+        const videoIntent = classifyIntent(title);
+        const hasUserFace = (face === "Yes");
+        
+        // ... (rest of the logic remains the same)
         // 2. Call Worker for Logic + Background Image
         const res = await fetch("[https://ctr-thumbnail-brain.sohamahire22.workers.dev](https://ctr-thumbnail-brain.sohamahire22.workers.dev)", {
             method: "POST",
