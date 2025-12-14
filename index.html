@@ -31,6 +31,24 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     canvas { width: 100%; display: block; }
+
+    /* Loading/Error Overlay */
+    #statusOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        color: yellow;
+        font-size: 20px;
+        text-align: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
@@ -74,8 +92,9 @@
     <button id="btn" onclick="generateThumbnail()">Generate Thumbnail</button>
   </div>
 
-  <div class="canvas-container" id="outputArea">
+  <div class="canvas-container" id="outputArea" style="position: relative;">
     <canvas id="thumbCanvas" width="1280" height="720"></canvas>
+    <div id="statusOverlay"></div>
     <p style="text-align: center; color: #94a3b8; padding: 10px;">Right-click image to Save As...</p>
   </div>
 </div>
@@ -84,6 +103,8 @@
 function updateFileName(input) {
     if(input.files && input.files[0]) {
         document.getElementById('fileName').innerText = "✅ Selected: " + input.files[0].name;
+    } else {
+         document.getElementById('fileName').innerText = "Click to upload Face (PNG/Cutout recommended)";
     }
 }
 
@@ -92,24 +113,27 @@ async function generateThumbnail() {
     const outputArea = document.getElementById("outputArea");
     const canvas = document.getElementById("thumbCanvas");
     const ctx = canvas.getContext("2d");
+    const statusOverlay = document.getElementById("statusOverlay");
 
     // 1. Prepare UI
-    btn.innerText = "Analyzing Logic & Generating Background...";
     btn.disabled = true;
     outputArea.style.display = "block";
+    statusOverlay.style.display = "flex";
     
-    // Clear canvas
+    // Clear canvas and set initial loading state
     ctx.fillStyle = "#020617";
     ctx.fillRect(0,0, 1280, 720);
     ctx.fillStyle = "white";
     ctx.font = "30px Arial";
-    ctx.fillText("Generating AI Background...", 500, 360);
-
+    ctx.textAlign = "center";
+    ctx.fillText("Sending request to CTR Engine...", 640, 360);
+    statusOverlay.innerText = "Analyzing Logic & Requesting AI Models...";
+    
     const hasFace = document.getElementById("userFace").files.length > 0 ? "Yes" : "No";
 
     try {
         // 2. Call Worker for Logic + Background Image
-        const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
+        const res = await fetch("[https://ctr-thumbnail-brain.sohamahire22.workers.dev](https://ctr-thumbnail-brain.sohamahire22.workers.dev)", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -120,13 +144,29 @@ async function generateThumbnail() {
                 face: hasFace
             })
         });
+        
+        // --- CRITICAL CHECK FOR 500/CORS FAILURE ---
+        if (!res.ok) {
+            let errorText = `HTTP Error ${res.status}. Check Console for details.`;
+            try {
+                const errorData = await res.json();
+                errorText = errorData.message || errorText;
+            } catch (e) {
+                errorText = `Critical Crash: Worker failed with status ${res.status}. AI Model call failed. Check Cloudflare Logs!`;
+            }
+            throw new Error(errorText); // Jumps to catch block
+        }
+        
         const data = await res.json();
+        statusOverlay.innerText = "✅ AI Background Received. Compositing your face...";
 
         // 3. Draw AI Background
         const bgImg = new Image();
         bgImg.src = data.image; // Base64 from worker
         await new Promise(r => bgImg.onload = r);
         ctx.drawImage(bgImg, 0, 0, 1280, 720);
+        
+        statusOverlay.innerText = "Drawing Text Overlay...";
 
         // 4. Draw User Face (If uploaded)
         if (hasFace === "Yes") {
@@ -139,48 +179,56 @@ async function generateThumbnail() {
                     userImg.src = e.target.result;
                     await new Promise(r => userImg.onload = r);
                     
-                    // Logic: Place face on LEFT (1/3rd rule) roughly
-                    // Maintain aspect ratio, max height 90% of thumbnail
+                    // Logic: Place face on LEFT (1/3rd rule)
                     const h = 720 * 0.9;
                     const w = userImg.width * (h / userImg.height);
                     
-                    // Draw face at bottom left
+                    // Draw face at bottom left, 50px margin
                     ctx.drawImage(userImg, 50, 720 - h, w, h);
                     resolve();
                 };
             });
+            statusOverlay.innerText = "Drawing Text Overlay...";
         }
 
         // 5. Draw CTR Text (Overlay)
-        // Style: Big, Impact font, Stroke, Shadow
         ctx.font = "900 130px Impact"; // Big bold font
         ctx.textAlign = "right";
         ctx.fillStyle = data.text_color;
         ctx.strokeStyle = "black";
-        ctx.lineWidth = 8;
+        ctx.lineWidth = 10;
         
-        // Shadow for contrast
+        [cite_start]// Shadow for contrast and prominence [cite: 174]
         ctx.shadowColor = "rgba(0,0,0,0.8)";
         ctx.shadowBlur = 15;
         ctx.shadowOffsetX = 5;
         ctx.shadowOffsetY = 5;
 
-        // Position: Top Right (to balance face on left)
-        // We split text into lines if needed, but rule says 1-3 words so usually 1 line
+        // Position: Top Right (to balance face on left, 80px margin)
         const textX = 1200;
-        const textY = 360; // Center vertical-ish
+        const textY = 360; 
 
         ctx.strokeText(data.text, textX, textY);
         ctx.fillText(data.text, textX, textY);
-
-        // Add "Check" or "Visual" if provided (Simple shapes could be added here later)
+        
+        statusOverlay.style.display = "none"; // Hide overlay on success
 
     } catch (e) {
-        alert("Error: " + e.message);
-        console.error(e);
+        // Display the error on the canvas overlay
+        ctx.fillStyle = "#FF0000";
+        ctx.font = "40px Arial";
+        ctx.textAlign = "center";
+        ctx.fillRect(0,0, 1280, 720);
+        
+        statusOverlay.style.display = "flex";
+        statusOverlay.style.backgroundColor = "rgba(255, 0, 0, 0.8)";
+        statusOverlay.innerText = "Error Generating Thumbnail:\n\n" + e.message;
+        
+        console.error("Fatal Generation Error:", e);
     } finally {
         btn.innerText = "Generate Thumbnail";
         btn.disabled = false;
+        // statusOverlay is hidden on success, or updated on failure.
     }
 }
 </script>
