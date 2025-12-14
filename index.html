@@ -164,7 +164,7 @@ async function generateThumbnail() {
 
   document.getElementById("output").innerText = "Thinking...";
 
-  const res = await fetch("https://ctr-thumbnail-brain.YOURNAME.workers.dev", {
+  const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ topic, audience, language })
