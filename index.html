@@ -2,159 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CTR Thumbnail Designer</title>
+  <title>CTR Thumbnail Gen (Real Face)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    /* Dark Theme */
+    /* Dark CTR Theme */
     body { font-family: 'Arial', sans-serif; background: #0f172a; color: #e5e7eb; margin: 0; padding: 20px; }
-    .container { max-width: 600px; margin: auto; }
+    .container { max-width: 800px; margin: auto; }
     
-    /* Input Styles */
-    .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
-    input, select { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; box-sizing: border-box;}
-    label { font-weight: bold; color: #94a3b8; font-size: 0.9em; }
+    /* Controls */
+    .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #334155; }
+    label { font-weight: bold; color: #94a3b8; font-size: 0.9em; display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 12px; margin-top: 5px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
     
-    button { width: 100%; padding: 15px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-    button:hover { background: #4f46e5; }
-    button:disabled { background: #475569; cursor: not-allowed; }
+    /* File Upload Styling */
+    .file-upload { border: 2px dashed #4f46e5; padding: 20px; text-align: center; border-radius: 8px; margin-top: 10px; cursor: pointer; }
+    .file-upload:hover { background: #1e1b4b; }
+    
+    button { width: 100%; padding: 15px; margin-top: 20px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+    button:disabled { background: #475569; cursor: wait; }
 
-    /* The Thumbnail Canvas */
-    .result-area { display: none; text-align: center; }
-    
-    .thumbnail-container {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 16/9;
-        background: #000;
+    /* Canvas for Real-Time Design */
+    .canvas-container {
+        display: none;
+        margin-top: 20px;
+        border: 2px solid #475569;
         border-radius: 8px;
         overflow: hidden;
-        border: 2px solid #475569;
-        margin-top: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-
-    /* The AI Image */
-    #finalImage {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0.9; /* Slight dim to make text pop */
-    }
-
-    /* The "Hybrid" Text Overlay */
-    #overlayText {
-        position: absolute;
-        top: 50%;
-        right: 5%; /* Rule: Text usually on right if face on left */
-        transform: translateY(-50%);
-        font-family: 'Impact', sans-serif; /* Classic YouTube Font */
-        font-size: 4vw; /* Responsive size */
-        font-weight: 900;
-        text-transform: uppercase;
-        line-height: 1.1;
-        text-shadow: 3px 3px 0px #000; /* Strong drop shadow for contrast */
-        text-align: right;
-        max-width: 60%;
-        z-index: 10;
-        /* Dynamic color will be set by JS */
-    }
+    canvas { width: 100%; display: block; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>CTR Thumbnail Designer</h1>
-  <p>Generates AI visuals + Rule-based Text Overlay</p>
+  <h1>CTR Engine (With Real Face)</h1>
+  <p>Generates rule-based backgrounds + layers your real photo.</p>
 
   <div class="card">
     <label>Video Title</label>
-    <input id="title" placeholder="e.g. How to Crack JEE Physics">
+    <input id="title" placeholder="e.g. How to Score 95% in Boards">
 
-    <label>Topic</label>
-    <input id="topic" placeholder="e.g. Rotational Motion">
+    <label>Topic / Subject</label>
+    <input id="topic" placeholder="e.g. Math Exam">
 
     <div style="display: flex; gap: 10px;">
         <div style="flex:1">
-            <label>Face?</label>
-            <select id="face"><option>Yes</option><option>No</option></select>
+            <label>Urgency</label>
+            <select id="urgency">
+                <option>Normal</option>
+                <option>Exam Soon</option>
+                <option>Result Phase</option>
+            </select>
         </div>
         <div style="flex:1">
-            <label>Urgency</label>
-            <select id="urgency"><option>Normal</option><option>Exam Soon</option><option>Result Phase</option></select>
+            <label>Creator Personality</label>
+            <select id="personality">
+                <option>Authority (Teacher)</option>
+                <option>Energetic (Bhaiya/Didi)</option>
+                <option>Calm (Guide)</option>
+            </select>
         </div>
     </div>
-    
-    <label>Creator Personality</label>
-    <select id="personality">
-        <option>Authority</option>
-        <option>Energetic</option>
-        <option>Calm</option>
-    </select>
 
-    <button id="btn" onclick="generate()">Generate Design</button>
+    <label>Your Photo (Optional)</label>
+    <div class="file-upload" onclick="document.getElementById('userFace').click()">
+        <span id="fileName">Click to upload Face (PNG/Cutout recommended)</span>
+        <input type="file" id="userFace" accept="image/*" style="display: none" onchange="updateFileName(this)">
+    </div>
+
+    <button id="btn" onclick="generateThumbnail()">Generate Thumbnail</button>
   </div>
 
-  <div class="result-area" id="result">
-    <h2>Final Design</h2>
-    
-    <div class="thumbnail-container" id="thumbContainer">
-        <img id="finalImage" src="" />
-        <div id="overlayText"></div>
-    </div>
-    
-    <p style="font-size: 12px; color: #64748b; margin-top: 10px;">
-        Right-click image to save (or Screenshot)
-    </p>
+  <div class="canvas-container" id="outputArea">
+    <canvas id="thumbCanvas" width="1280" height="720"></canvas>
+    <p style="text-align: center; color: #94a3b8; padding: 10px;">Right-click image to Save As...</p>
   </div>
 </div>
 
 <script>
-async function generate() {
+function updateFileName(input) {
+    if(input.files && input.files[0]) {
+        document.getElementById('fileName').innerText = "✅ Selected: " + input.files[0].name;
+    }
+}
+
+async function generateThumbnail() {
     const btn = document.getElementById("btn");
-    const result = document.getElementById("result");
-    const img = document.getElementById("finalImage");
-    const txt = document.getElementById("overlayText");
+    const outputArea = document.getElementById("outputArea");
+    const canvas = document.getElementById("thumbCanvas");
+    const ctx = canvas.getContext("2d");
 
-    // UI Loading State
-    btn.innerText = "Designing (approx 10s)...";
+    // 1. Prepare UI
+    btn.innerText = "Analyzing Logic & Generating Background...";
     btn.disabled = true;
-    result.style.display = "none";
+    outputArea.style.display = "block";
+    
+    // Clear canvas
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0,0, 1280, 720);
+    ctx.fillStyle = "white";
+    ctx.font = "30px Arial";
+    ctx.fillText("Generating AI Background...", 500, 360);
 
-    const payload = {
-        title: document.getElementById("title").value,
-        topic: document.getElementById("topic").value,
-        face: document.getElementById("face").value,
-        urgency: document.getElementById("urgency").value,
-        personality: document.getElementById("personality").value,
-        exam: "General", // simplified for demo
-        audience: "Student"
-    };
+    const hasFace = document.getElementById("userFace").files.length > 0 ? "Yes" : "No";
 
     try {
-        // Replace this URL with your actual Worker URL
+        // 2. Call Worker for Logic + Background Image
         const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                title: document.getElementById("title").value,
+                topic: document.getElementById("topic").value,
+                urgency: document.getElementById("urgency").value,
+                personality: document.getElementById("personality").value,
+                face: hasFace
+            })
         });
-
         const data = await res.json();
 
-        // 1. Set the AI Image
-        img.src = data.image;
+        // 3. Draw AI Background
+        const bgImg = new Image();
+        bgImg.src = data.image; // Base64 from worker
+        await new Promise(r => bgImg.onload = r);
+        ctx.drawImage(bgImg, 0, 0, 1280, 720);
 
-        // 2. Set the Text (Apply Logic Rules)
-        txt.innerText = data.text;
-        txt.style.color = data.text_color;
+        // 4. Draw User Face (If uploaded)
+        if (hasFace === "Yes") {
+            const userFile = document.getElementById("userFace").files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(userFile);
+            await new Promise(resolve => {
+                reader.onload = async (e) => {
+                    const userImg = new Image();
+                    userImg.src = e.target.result;
+                    await new Promise(r => userImg.onload = r);
+                    
+                    // Logic: Place face on LEFT (1/3rd rule) roughly
+                    // Maintain aspect ratio, max height 90% of thumbnail
+                    const h = 720 * 0.9;
+                    const w = userImg.width * (h / userImg.height);
+                    
+                    // Draw face at bottom left
+                    ctx.drawImage(userImg, 50, 720 - h, w, h);
+                    resolve();
+                };
+            });
+        }
+
+        // 5. Draw CTR Text (Overlay)
+        // Style: Big, Impact font, Stroke, Shadow
+        ctx.font = "900 130px Impact"; // Big bold font
+        ctx.textAlign = "right";
+        ctx.fillStyle = data.text_color;
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 8;
         
-        // Optional: Adjust alignment based on face logic (if face is left, text is right)
-        // For this version, we default to Right-aligned text as per the Worker logic.
+        // Shadow for contrast
+        ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.shadowBlur = 15;
+        ctx.shadowOffsetX = 5;
+        ctx.shadowOffsetY = 5;
 
-        result.style.display = "block";
+        // Position: Top Right (to balance face on left)
+        // We split text into lines if needed, but rule says 1-3 words so usually 1 line
+        const textX = 1200;
+        const textY = 360; // Center vertical-ish
+
+        ctx.strokeText(data.text, textX, textY);
+        ctx.fillText(data.text, textX, textY);
+
+        // Add "Check" or "Visual" if provided (Simple shapes could be added here later)
+
     } catch (e) {
-        alert("Error generating thumbnail. Please try again.");
+        alert("Error: " + e.message);
         console.error(e);
     } finally {
-        btn.innerText = "Generate Design";
+        btn.innerText = "Generate Thumbnail";
         btn.disabled = false;
     }
 }
