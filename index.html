@@ -1,221 +1,162 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>CTR Thumbnail Engine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <title>CTR Thumbnail Designer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    /* Dark Theme */
+    body { font-family: 'Arial', sans-serif; background: #0f172a; color: #e5e7eb; margin: 0; padding: 20px; }
+    .container { max-width: 600px; margin: auto; }
+    
+    /* Input Styles */
+    .card { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+    input, select { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; box-sizing: border-box;}
+    label { font-weight: bold; color: #94a3b8; font-size: 0.9em; }
+    
+    button { width: 100%; padding: 15px; background: #6366f1; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+    button:hover { background: #4f46e5; }
+    button:disabled { background: #475569; cursor: not-allowed; }
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      margin: 0;
-      padding: 0;
-    }
+    /* The Thumbnail Canvas */
+    .result-area { display: none; text-align: center; }
+    
+    .thumbnail-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #000;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid #475569;
+        margin-top: 20px;
+    }
 
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 40px 20px;
-    }
+    /* The AI Image */
+    #finalImage {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.9; /* Slight dim to make text pop */
+    }
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
-
-    p {
-      color: #cbd5f5;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background: #020617;
-      border-radius: 12px;
-      padding: 25px;
-      margin-bottom: 30px;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      background: #020617;
-      color: white;
-      border: 1px solid #334155;
-    }
-
-    button {
-      margin-top: 25px;
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: bold;
-      background: #6366f1;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #4f46e5;
-    }
-
-    .output {
-      display: none;
-    }
-
-    .output-box {
-      background: #020617;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 15px;
-      border: 1px solid #334155;
-    }
-
-    .output-box strong {
-      color: #a5b4fc;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 14px;
-      color: #64748b;
-      margin-top: 50px;
-    }
-  </style>
+    /* The "Hybrid" Text Overlay */
+    #overlayText {
+        position: absolute;
+        top: 50%;
+        right: 5%; /* Rule: Text usually on right if face on left */
+        transform: translateY(-50%);
+        font-family: 'Impact', sans-serif; /* Classic YouTube Font */
+        font-size: 4vw; /* Responsive size */
+        font-weight: 900;
+        text-transform: uppercase;
+        line-height: 1.1;
+        text-shadow: 3px 3px 0px #000; /* Strong drop shadow for contrast */
+        text-align: right;
+        max-width: 60%;
+        z-index: 10;
+        /* Dynamic color will be set by JS */
+    }
+  </style>
 </head>
-
 <body>
 
 <div class="container">
-  <h1>CTR Thumbnail Engine</h1>
-  <p>Generate high-click thumbnail plans for Indian education creators using proven CTR logic.</p>
+  <h1>CTR Thumbnail Designer</h1>
+  <p>Generates AI visuals + Rule-based Text Overlay</p>
 
-  <div class="card">
-    <label>Video Title</label>
-    <input id="title" placeholder="Enter your YouTube video title"/>
+  <div class="card">
+    <label>Video Title</label>
+    <input id="title" placeholder="e.g. How to Crack JEE Physics">
 
-    <label>Video Topic / Syllabus</label>
-    <input id="topic" placeholder="Ex: Trigonometry Board Exam"/>
+    <label>Topic</label>
+    <input id="topic" placeholder="e.g. Rotational Motion">
 
-    <label>Exam Type</label>
-    <select id="exam">
-      <option>Board</option>
-      <option>JEE</option>
-      <option>NEET</option>
-      <option>Skill</option>
-      <option>General Education</option>
-    </select>
-
-    <label>Audience Level</label>
-    <select id="audience">
-      <option>Beginner</option>
-      <option>Intermediate</option>
-      <option>Advanced</option>
-    </select>
-
-    <label>Face Available?</label>
-    <select id="face">
-      <option>Yes</option>
-      <option>No</option>
-    </select>
-
-    <label>Urgency Level</label>
-    <select id="urgency">
-      <option>Normal</option>
-      <option>Exam Soon</option>
-      <option>Result Phase</option>
-    </select>
-
+    <div style="display: flex; gap: 10px;">
+        <div style="flex:1">
+            <label>Face?</label>
+            <select id="face"><option>Yes</option><option>No</option></select>
+        </div>
+        <div style="flex:1">
+            <label>Urgency</label>
+            <select id="urgency"><option>Normal</option><option>Exam Soon</option><option>Result Phase</option></select>
+        </div>
+    </div>
+    
     <label>Creator Personality</label>
-    <select id="personality">
-      <option>Calm</option>
-      <option>Energetic</option>
-      <option>Authority</option>
-    </select>
+    <select id="personality">
+        <option>Authority</option>
+        <option>Energetic</option>
+        <option>Calm</option>
+    </select>
 
-   <button onclick="generateThumbnail()">Generate</button>
+    <button id="btn" onclick="generate()">Generate Design</button>
+  </div>
 
-  </div>
-
-  <div class="card output" id="output">
-    <h2>CTR Thumbnail Plan</h2>
-
-    <div class="output-box"><strong>Video Intent:</strong> <span id="intent"></span></div>
-    <div class="output-box"><strong>Face Usage:</strong> <span id="faceUsage"></span></div>
-    <div class="output-box"><strong>Thumbnail Text:</strong> <span id="thumbText"></span></div>
-    <div class="output-box"><strong>Color Palette:</strong> <span id="colors"></span></div>
-    <div class="output-box"><strong>Layout Instructions:</strong> <span id="layout"></span></div>
-  </div>
-
-  <footer>
-    Built for Indian education creators · CTR-first system
-  </footer>
+  <div class="result-area" id="result">
+    <h2>Final Design</h2>
+    
+    <div class="thumbnail-container" id="thumbContainer">
+        <img id="finalImage" src="" />
+        <div id="overlayText"></div>
+    </div>
+    
+    <p style="font-size: 12px; color: #64748b; margin-top: 10px;">
+        Right-click image to save (or Screenshot)
+    </p>
+  </div>
 </div>
 
 <script>
-async function generateThumbnail() {
-  // Read inputs
-  const title = document.getElementById("title").value;
-  const topic = document.getElementById("topic").value;
-  const exam = document.getElementById("exam").value;
-  const audience = document.getElementById("audience").value;
-  const face = document.getElementById("face").value;
-  const urgency = document.getElementById("urgency").value;
-  const personality = document.getElementById("personality").value; // Added
+async function generate() {
+    const btn = document.getElementById("btn");
+    const result = document.getElementById("result");
+    const img = document.getElementById("finalImage");
+    const txt = document.getElementById("overlayText");
 
-  // Show output card
-  document.getElementById("output").style.display = "block";
+    // UI Loading State
+    btn.innerText = "Designing (approx 10s)...";
+    btn.disabled = true;
+    result.style.display = "none";
 
-  // Temporary loading state
-  document.getElementById("intent").innerText = "Analyzing video intent...";
-  document.getElementById("faceUsage").innerText = "Processing...";
-  document.getElementById("thumbText").innerText = "Generating...";
-  document.getElementById("colors").innerText = "Choosing...";
-  document.getElementById("layout").innerText = "Designing...";
+    const payload = {
+        title: document.getElementById("title").value,
+        topic: document.getElementById("topic").value,
+        face: document.getElementById("face").value,
+        urgency: document.getElementById("urgency").value,
+        personality: document.getElementById("personality").value,
+        exam: "General", // simplified for demo
+        audience: "Student"
+    };
 
-  // Call backend AI
-  const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      title,
-      topic,
-      exam,
-      audience,
-      face,
-      urgency,
-      personality // Added
-    })
-  });
+    try {
+        // Replace this URL with your actual Worker URL
+        const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
 
-  const data = await res.json();
+        const data = await res.json();
 
-  // Fill outputs
-  document.getElementById("intent").innerText =
-    data.intent || "Educational CTR optimization";
+        // 1. Set the AI Image
+        img.src = data.image;
 
- document.getElementById("faceUsage").innerText =
-    data.face || "Use expressive face on 1/3rd side";
+        // 2. Set the Text (Apply Logic Rules)
+        txt.innerText = data.text;
+        txt.style.color = data.text_color;
+        
+        // Optional: Adjust alignment based on face logic (if face is left, text is right)
+        // For this version, we default to Right-aligned text as per the Worker logic.
 
-  document.getElementById("thumbText").innerText =
-    data.thumbnail_text || "Crack This Fast";
-
-  document.getElementById("colors").innerText =
-    data.colors || "Yellow + Black (High contrast)";
-
-  document.getElementById("layout").innerText =
-    data.layout || "Face left, text right, topic visual centered";
+        result.style.display = "block";
+    } catch (e) {
+        alert("Error generating thumbnail. Please try again.");
+        console.error(e);
+    } finally {
+        btn.innerText = "Generate Design";
+        btn.disabled = false;
+    }
 }
 </script>
 
