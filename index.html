@@ -159,23 +159,47 @@
 
 <script>
 async function generateThumbnail() {
+  // Read inputs
+  const title = document.getElementById("title").value;
   const topic = document.getElementById("topic").value;
+  const exam = document.getElementById("exam").value;
   const audience = document.getElementById("audience").value;
-  const language = document.getElementById("language").value;
+  const face = document.getElementById("face").value;
+  const urgency = document.getElementById("urgency").value;
 
-  document.getElementById("output").innerText = "Thinking...";
+  // Show output card
+  document.getElementById("output").style.display = "block";
 
+  // Temporary loading state
+  document.getElementById("intent").innerText = "Analyzing video intent...";
+  document.getElementById("faceUsage").innerText = "Processing...";
+  document.getElementById("thumbText").innerText = "Generating...";
+  document.getElementById("colors").innerText = "Choosing...";
+  document.getElementById("layout").innerText = "Designing...";
+
+  // Call backend AI
   const res = await fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ topic, audience, language })
+    body: JSON.stringify({
+      title,
+      topic,
+      exam,
+      audience,
+      face,
+      urgency
+    })
   });
 
   const data = await res.json();
-  document.getElementById("output").innerText =
-    data.response || JSON.stringify(data, null, 2);
-}
-</script>
+
+  // Fill outputs
+  document.getElementById("intent").innerText =
+    data.intent || "Educational CTR optimization";
+
+  document.getElementById("faceUsage").innerText =
+    data.face || "Use expressiv
+
 
 
 </body>
