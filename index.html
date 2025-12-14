@@ -158,7 +158,24 @@
 
 <script>
 function generate() {
-  // TEMPORARY DEMO OUTPUT (will be replaced by backend)
+ fetch("https://ctr-thumbnail-brain.sohamahire22.workers.dev", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    topic: document.getElementById("topic").value,
+    audience: document.getElementById("audience").value,
+    language: document.getElementById("language").value
+  })
+})
+.then(res => res.json())
+.then(data => {
+  document.getElementById("output").innerText =
+    data.response || JSON.stringify(data, null, 2);
+})
+.catch(err => {
+  document.getElementById("output").innerText = "Error connecting AI";
+});
+
   document.getElementById("intent").innerText = "STRATEGY";
   document.getElementById("faceUsage").innerText = "Yes · Confident · Right side (35%)";
   document.getElementById("thumbText").innerText = "90+ MARKS";
